@@ -1,0 +1,322 @@
+{
+  "plans": [
+    {
+      "id": "plan_free",
+      "name": "Free Starter",
+      "price": 0,
+      "billingCycle": "monthly",
+      "features": [
+        "Up to 15 Leads",
+        "Basic CRM Pipeline",
+        "Manual Lead Entry"
+      ],
+      "status": "active",
+      "createdAt": "2026-06-08T07:43:52.460Z"
+    },
+    {
+      "id": "plan_pro",
+      "name": "Growth Pro",
+      "price": 29,
+      "billingCycle": "monthly",
+      "features": [
+        "Unlimited Leads",
+        "Advanced Follow-up Manager",
+        "Speech-to-Text Lead Entry",
+        "Activity Reports"
+      ],
+      "status": "active",
+      "createdAt": "2026-06-08T07:43:52.460Z"
+    },
+    {
+      "id": "plan_ent",
+      "name": "Enterprise Plus",
+      "price": 99,
+      "billingCycle": "monthly",
+      "features": [
+        "Everything in Pro",
+        "Dedicated Account Manager",
+        "Custom API Access",
+        "SLA Support"
+      ],
+      "status": "active",
+      "createdAt": "2026-06-08T07:43:52.460Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "user_admin",
+      "email": "admin@crm.com",
+      "password": "adminpassword",
+      "name": "Sarah Jenkins (Admin)",
+      "role": "admin",
+      "planId": "plan_ent",
+      "planStatus": "active",
+      "planStartDate": "2026-06-08T07:43:52.460Z",
+      "createdAt": "2026-05-09T07:43:52.460Z"
+    },
+    {
+      "id": "user_demo",
+      "email": "demo@crm.com",
+      "password": "demopassword",
+      "name": "Shivam Rawat",
+      "role": "user",
+      "planId": "plan_ent",
+      "planStatus": "active",
+      "planStartDate": "2026-06-08T08:06:08.212Z",
+      "createdAt": "2026-05-24T07:43:52.460Z"
+    },
+    {
+      "id": "user_new",
+      "email": "alex@example.com",
+      "password": "password123",
+      "name": "Alex Rivera",
+      "role": "user",
+      "planId": "plan_free",
+      "planStatus": "active",
+      "planStartDate": "2026-06-03T07:43:52.460Z",
+      "createdAt": "2026-06-03T07:43:52.460Z"
+    }
+  ],
+  "leads": [
+    {
+      "id": "lead_1",
+      "userId": "user_demo",
+      "name": "John Doe",
+      "company": "Stark Industries",
+      "email": "john@stark.com",
+      "phone": "+1 (555) 123-4567",
+      "budget": 12000,
+      "status": "Qualified",
+      "priority": "High",
+      "notes": "Interested in core licensing. Prefers communication via email. Had a great intro call.",
+      "createdAt": "2026-05-29T07:43:52.460Z",
+      "updatedAt": "2026-05-31T07:43:52.460Z"
+    },
+    {
+      "id": "lead_2",
+      "userId": "user_demo",
+      "name": "Jane Smith",
+      "company": "Acme Corp",
+      "email": "jane@acme.com",
+      "phone": "+1 (555) 987-6543",
+      "budget": 4500,
+      "status": "Proposal",
+      "priority": "Medium",
+      "notes": "Sent pricing proposal for 5 user seats. Awaiting feedback by end of week.",
+      "createdAt": "2026-06-01T07:43:52.460Z",
+      "updatedAt": "2026-06-03T07:43:52.460Z"
+    },
+    {
+      "id": "lead_3",
+      "userId": "user_demo",
+      "name": "David Lee",
+      "company": "Nova Technologies",
+      "email": "david.l@novatech.io",
+      "phone": "+1 (555) 246-8102",
+      "budget": 8500,
+      "status": "New",
+      "priority": "Low",
+      "notes": "Registered via web form. Needs follow up call to assess business requirements.",
+      "createdAt": "2026-06-06T07:43:52.460Z",
+      "updatedAt": "2026-06-06T07:43:52.460Z"
+    },
+    {
+      "id": "lead_4",
+      "userId": "user_demo",
+      "name": "Elena Rostova",
+      "company": "Siberia Software",
+      "email": "elena@siberiasoft.ru",
+      "phone": "+7 (495) 111-2233",
+      "budget": 25000,
+      "status": "Won",
+      "priority": "High",
+      "notes": "Deal closed successfully! Contract signed on 4th June. Handed over to onboarding team.",
+      "createdAt": "2026-05-27T07:43:52.460Z",
+      "updatedAt": "2026-06-04T07:43:52.460Z"
+    },
+    {
+      "id": "lead_5",
+      "userId": "user_demo",
+      "name": "Marcus Brody",
+      "company": "Museum Artifacts Ltd",
+      "email": "m.brody@museum.org",
+      "phone": "+44 20 7946 0958",
+      "budget": 1500,
+      "status": "Contacted",
+      "priority": "Low",
+      "notes": "Left a voicemail. Will follow up in 3 days.",
+      "createdAt": "2026-06-04T07:43:52.460Z",
+      "updatedAt": "2026-06-05T07:43:52.460Z"
+    }
+  ],
+  "followups": [],
+  "activities": [
+    {
+      "id": "act_oxh04i8nv",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Plan Purchase",
+      "details": "Upgraded to \"Enterprise Plus\" plan ($99/monthly)",
+      "timestamp": "2026-06-08T08:06:08.213Z"
+    },
+    {
+      "id": "act_4x2c63f5r",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Login",
+      "details": "Logged in to the CRM",
+      "timestamp": "2026-06-08T07:45:39.591Z"
+    },
+    {
+      "id": "act_ia75711m6",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Login",
+      "details": "Logged in to the CRM",
+      "timestamp": "2026-06-08T07:45:32.879Z"
+    },
+    {
+      "id": "act_4cszzjf2n",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Login",
+      "details": "Logged in to the CRM",
+      "timestamp": "2026-06-08T07:45:32.048Z"
+    },
+    {
+      "id": "act_x9fklkvk7",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Login",
+      "details": "Logged in to the CRM",
+      "timestamp": "2026-06-08T07:45:29.244Z"
+    },
+    {
+      "id": "act_2y8r77sb2",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Login",
+      "details": "Logged in to the CRM",
+      "timestamp": "2026-06-08T07:43:55.829Z"
+    },
+    {
+      "id": "act_1",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Login",
+      "details": "User logged in to the platform",
+      "timestamp": "2026-06-08T05:43:52.460Z"
+    },
+    {
+      "id": "act_2",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Speech-to-Text Lead Entry",
+      "details": "Created lead \"David Lee\" using voice transcription",
+      "timestamp": "2026-06-06T07:43:52.460Z"
+    },
+    {
+      "id": "act_3",
+      "userId": "user_new",
+      "userName": "Alex Rivera",
+      "action": "Registration",
+      "details": "Registered a new free account",
+      "timestamp": "2026-06-03T07:43:52.460Z"
+    },
+    {
+      "id": "act_4",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Plan Purchase",
+      "details": "Upgraded subscription to Growth Pro plan",
+      "timestamp": "2026-05-24T07:43:52.460Z"
+    },
+    {
+      "id": "act_5",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Lead Created",
+      "details": "Added lead \"Elena Rostova\" manually",
+      "timestamp": "2026-05-27T07:43:52.460Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_r94vfggos",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "planName": "Enterprise Plus",
+      "amount": 99,
+      "billingCycle": "monthly",
+      "status": "success",
+      "timestamp": "2026-06-08T08:06:08.212Z",
+      "invoiceNo": "INV-2026-007"
+    },
+    {
+      "id": "tx_1",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "planName": "Growth Pro",
+      "amount": 29,
+      "billingCycle": "monthly",
+      "status": "success",
+      "timestamp": "2026-05-24T07:43:52.460Z",
+      "invoiceNo": "INV-2026-001"
+    },
+    {
+      "id": "tx_2",
+      "userId": "user_new",
+      "userName": "Alex Rivera",
+      "planName": "Free Starter",
+      "amount": 0,
+      "billingCycle": "monthly",
+      "status": "success",
+      "timestamp": "2026-06-03T07:43:52.460Z",
+      "invoiceNo": "INV-2026-002"
+    },
+    {
+      "id": "tx_3",
+      "userId": "user_user_99",
+      "userName": "Alice Cooper",
+      "planName": "Growth Pro",
+      "amount": 29,
+      "billingCycle": "monthly",
+      "status": "success",
+      "timestamp": "2026-04-24T07:43:52.460Z",
+      "invoiceNo": "INV-2026-003"
+    },
+    {
+      "id": "tx_4",
+      "userId": "user_user_98",
+      "userName": "Bob Vance",
+      "planName": "Enterprise Plus",
+      "amount": 99,
+      "billingCycle": "monthly",
+      "status": "success",
+      "timestamp": "2026-03-25T07:43:52.460Z",
+      "invoiceNo": "INV-2026-004"
+    },
+    {
+      "id": "tx_5",
+      "userId": "user_user_97",
+      "userName": "Charlie Brown",
+      "planName": "Growth Pro",
+      "amount": 29,
+      "billingCycle": "monthly",
+      "status": "success",
+      "timestamp": "2026-02-18T07:43:52.460Z",
+      "invoiceNo": "INV-2026-005"
+    },
+    {
+      "id": "tx_6",
+      "userId": "user_user_96",
+      "userName": "Diana Prince",
+      "planName": "Enterprise Plus",
+      "amount": 99,
+      "billingCycle": "monthly",
+      "status": "success",
+      "timestamp": "2026-01-19T07:43:52.460Z",
+      "invoiceNo": "INV-2026-006"
+    }
+  ]
+}

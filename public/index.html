@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexCRM - Premium SaaS CRM with Voice Intake</title>
+  <meta name="description" content="Manage your sales pipeline, track leads, automate follow-ups, and capture information instantly using Speech-to-Text intelligence.">
+  
+  <!-- Google Fonts - Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Chart.js for Admin Panel analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- App Toast Notification -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Landing Page (Public View) -->
+  <section id="view-landing" class="view-section active">
+    <!-- Navbar -->
+    <nav class="landing-nav">
+      <div class="logo">
+        <i data-lucide="zap" class="logo-icon"></i>
+        <span>Apex<span>CRM</span></span>
+      </div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <button class="btn btn-outline" onclick="showView('auth-login')">Sign In</button>
+        <button class="btn btn-primary" onclick="showView('auth-register')">Start Free Trial</button>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+      <div class="hero-content">
+        <span class="badge badge-indigo animate-pulse">Next-Gen SaaS CRM</span>
+        <h1>Close deals faster with <span>Voice Intelligence</span></h1>
+        <p class="hero-desc">The light-themed, high-performance CRM that lets you dictate leads on the go, track pipelines, and automate follow-ups. No more typing tedious data.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" onclick="showView('auth-register')">Get Started For Free</button>
+          <button class="btn btn-outline btn-lg" onclick="scrollToSection('features')">See Features</button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item"><span class="stat-num">99.8%</span><span class="stat-label">Speech Accuracy</span></div>
+          <div class="stat-item"><span class="stat-num">10k+</span><span class="stat-label">Active Sales Reps</span></div>
+          <div class="stat-item"><span class="stat-num">2.4x</span><span class="stat-label">Pipeline Efficiency</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="mockup-window">
+          <div class="mockup-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="mockup-title">ApexCRM Dashboard</span>
+          </div>
+          <div class="mockup-body">
+            <div class="mock-grid">
+              <div class="mock-sidebar"></div>
+              <div class="mock-content">
+                <div class="mock-row">
+                  <div class="mock-card"></div>
+                  <div class="mock-card"></div>
+                  <div class="mock-card"></div>
+                </div>
+                <div class="mock-big-card">
+                  <div class="mock-line header"></div>
+                  <div class="mock-line"></div>
+                  <div class="mock-line short"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+      <div class="section-header">
+        <h2>Built for high-velocity sales teams</h2>
+        <p>Everything you need to manage your customer relations and scale SaaS operations.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feat-icon-box"><i data-lucide="mic"></i></div>
+          <h3>Speech-to-Text Leads</h3>
+          <p>Talk to your CRM. Dictate contact info, budgets, and notes. Our AI parser extracts details in seconds.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon-box"><i data-lucide="kanban"></i></div>
+          <h3>Kanban Pipeline</h3>
+          <p>Drag and drop leads through visual sales stages. Clean, clutter-free board design optimized for UX.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon-box"><i data-lucide="calendar"></i></div>
+          <h3>Smart Follow-ups</h3>
+          <p>Never miss a call or demo. Stay updated with automatic scheduling and follow-up deadline alarms.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon-box"><i data-lucide="shield-check"></i></div>
+          <h3>Admin & SaaS Analytics</h3>
+          <p>Full-scale admin suite to monitor user activity, customize plan prices, and track recurring subscription income.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+      <div class="section-header">
+        <h2>Simple, transparent pricing</h2>
+        <p>Start free and scale as your pipeline grows. No credit card required to try.</p>
+      </div>
+      <div class="pricing-grid" id="landing-pricing-cards">
+        <!-- Plans will load dynamically here -->
+        <div class="loading-spinner"></div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+      <div class="footer-logo">
+        <i data-lucide="zap"></i>
+        <span>ApexCRM</span>
+      </div>
+      <p>&copy; 2026 ApexCRM Inc. All rights reserved. Made for Shivam.</p>
+    </footer>
+  </section>
+
+
+  <!-- Authentication View -->
+  <section id="view-auth" class="view-section auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo justify-center" onclick="showView('landing')">
+          <i data-lucide="zap" class="logo-icon"></i>
+          <span>Apex<span>CRM</span></span>
+        </div>
+        <h2 id="auth-title">Welcome Back</h2>
+        <p id="auth-subtitle">Sign in to access your CRM workspace</p>
+      </div>
+
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+        <div class="form-group" id="form-group-name" style="display: none;">
+          <label for="auth-name">Full Name</label>
+          <div class="input-wrapper">
+            <i data-lucide="user" class="input-icon"></i>
+            <input type="text" id="auth-name" placeholder="John Doe">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="auth-email">Email Address</label>
+          <div class="input-wrapper">
+            <i data-lucide="mail" class="input-icon"></i>
+            <input type="email" id="auth-email" placeholder="you@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="auth-password">Password</label>
+          <div class="input-wrapper">
+            <i data-lucide="lock" class="input-icon"></i>
+            <input type="password" id="auth-password" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="auth-btn">Sign In</button>
+      </form>
+
+      <div class="auth-footer">
+        <p id="auth-toggle-text">Don't have an account? <a href="#" onclick="toggleAuthMode(true)">Create one</a></p>
+        <div class="demo-logins">
+          <p>Demo accounts for testing:</p>
+          <div class="demo-buttons">
+            <button class="btn btn-xs btn-outline" onclick="fillDemoCredentials('demo@crm.com', 'demopassword')">CRM User Demo</button>
+            <button class="btn btn-xs btn-outline" onclick="fillDemoCredentials('admin@crm.com', 'adminpassword')">SaaS Admin Demo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Main App Layout (Logged In) -->
+  <div id="app-layout" class="app-layout" style="display: none;">
+    <!-- Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <div class="logo">
+          <i data-lucide="zap" class="logo-icon"></i>
+          <span>Apex<span>CRM</span></span>
+        </div>
+        <span class="user-role-badge" id="sidebar-role-badge">User</span>
+      </div>
+
+      <!-- Navigation for Regular User -->
+      <nav class="sidebar-nav" id="nav-user">
+        <a href="#" class="nav-item active" onclick="switchTab('user-dashboard')">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('user-pipeline')">
+          <i data-lucide="kanban"></i>
+          <span>Leads Board</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('user-speech')">
+          <i data-lucide="mic"></i>
+          <span>Speech Entry</span>
+          <span class="badge badge-emerald-light float-right">AI</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('user-followups')">
+          <i data-lucide="calendar"></i>
+          <span>Follow-ups</span>
+          <span class="badge badge-warning-light float-right" id="badge-followup-count" style="display:none">0</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('user-billing')">
+          <i data-lucide="credit-card"></i>
+          <span>Billing & Plans</span>
+        </a>
+      </nav>
+
+      <!-- Navigation for Admin -->
+      <nav class="sidebar-nav" id="nav-admin" style="display: none;">
+        <a href="#" class="nav-item active" onclick="switchTab('admin-dashboard')">
+          <i data-lucide="bar-chart-3"></i>
+          <span>Overview</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('admin-plans')">
+          <i data-lucide="package"></i>
+          <span>SaaS Plans</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('admin-users')">
+          <i data-lucide="users"></i>
+          <span>User Activity</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('admin-transactions')">
+          <i data-lucide="banknote"></i>
+          <span>Income / Revenue</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar User Profile Area -->
+      <div class="sidebar-profile">
+        <div class="profile-avatar">
+          <span id="profile-initials">U</span>
+        </div>
+        <div class="profile-info">
+          <h4 id="profile-name">User Name</h4>
+          <p id="profile-plan">Free Starter</p>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()" title="Logout">
+          <i data-lucide="log-out"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- Top Header -->
+      <header class="app-header">
+        <div class="header-search">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" id="global-search" placeholder="Search leads, companies..." oninput="handleGlobalSearch(this.value)">
+        </div>
+        <div class="header-actions">
+          <!-- Quick Speech Button for CRM user -->
+          <button class="btn btn-emerald flex items-center gap-1" id="header-voice-btn" onclick="switchTab('user-speech')">
+            <i data-lucide="mic"></i>
+            <span>Voice Lead</span>
+          </button>
+          
+          <button class="btn btn-primary" id="header-add-lead-btn" onclick="openLeadModal()">
+            <i data-lucide="plus"></i>
+            <span>Add Lead</span>
+          </button>
+          
+          <!-- Admin shortcut warning -->
+          <div class="admin-indicator" id="header-admin-indicator" style="display: none;">
+            <i data-lucide="shield" class="text-indigo"></i>
+            <span>Admin Control Panel</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- App Tabs Container -->
+      <div class="app-content-container">
+
+        <!-- TAB: USER DASHBOARD -->
+        <div id="tab-user-dashboard" class="tab-panel active">
+          <div class="tab-title-row">
+            <div>
+              <h2 class="welcome-text">Hello, <span id="dashboard-user-name">User</span>!</h2>
+              <p class="subtitle-text">Here is your sales pipeline overview for today.</p>
+            </div>
+            <div id="dashboard-quota-container" class="plan-quota-box">
+              <span>Leads Quota: <strong id="lead-quota-used">0</strong> / <strong id="lead-quota-total">15</strong></span>
+              <div class="progress-bar-bg"><div id="lead-quota-progress" class="progress-bar-fill" style="width: 0%"></div></div>
+            </div>
+          </div>
+
+          <!-- Mini Metrics Cards -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-icon-box bg-indigo-light text-indigo">
+                <i data-lucide="user-plus"></i>
+              </div>
+              <div class="metric-info">
+                <h3>Total Leads</h3>
+                <p class="metric-value" id="user-stat-total-leads">0</p>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-box bg-rose-light text-rose">
+                <i data-lucide="flame"></i>
+              </div>
+              <div class="metric-info">
+                <h3>Hot Leads</h3>
+                <p class="metric-value" id="user-stat-hot-leads">0</p>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-box bg-warning-light text-warning">
+                <i data-lucide="calendar"></i>
+              </div>
+              <div class="metric-info">
+                <h3>Followups Pending</h3>
+                <p class="metric-value" id="user-stat-pending-followups">0</p>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-box bg-success-light text-success">
+                <i data-lucide="dollar-sign"></i>
+              </div>
+              <div class="metric-info">
+                <h3>Pipeline Value</h3>
+                <p class="metric-value" id="user-stat-pipeline-value">$0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom sections: Upcoming Followups & Lead Status Distribution -->
+          <div class="dashboard-split-grid">
+            <!-- Follow-up tasks panel -->
+            <div class="content-card">
+              <div class="card-header">
+                <h3>Scheduled Follow-ups Today</h3>
+                <button class="btn btn-xs btn-outline" onclick="switchTab('user-followups')">View All</button>
+              </div>
+              <div class="card-body">
+                <div class="followups-list" id="dashboard-followups-list">
+                  <!-- Dynamic loading -->
+                  <p class="text-muted text-center py-4">No followups scheduled for today.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pipeline Funnel summary -->
+            <div class="content-card">
+              <div class="card-header">
+                <h3>Leads by Stage</h3>
+              </div>
+              <div class="card-body">
+                <div class="pipeline-summary-list" id="dashboard-pipeline-summary">
+                  <!-- Dynamic stages -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: USER PIPELINE (KANBAN BOARD) -->
+        <div id="tab-user-pipeline" class="tab-panel">
+          <div class="tab-title-row">
+            <div>
+              <h2>Sales Pipeline Board</h2>
+              <p class="subtitle-text">Drag and drop cards to change stages, click on them to edit details.</p>
+            </div>
+            <div class="view-toggles">
+              <button class="btn btn-sm btn-outline active" id="btn-view-kanban" onclick="toggleLeadViewMode('kanban')">
+                <i data-lucide="layout-grid"></i> Kanban
+              </button>
+              <button class="btn btn-sm btn-outline" id="btn-view-list" onclick="toggleLeadViewMode('list')">
+                <i data-lucide="list"></i> List View
+              </button>
+            </div>
+          </div>
+
+          <!-- Kanban View Grid -->
+          <div id="leads-kanban-view" class="kanban-board-container">
+            <!-- Dynamic columns: New, Contacted, Qualified, Proposal, Won, Lost -->
+            <div class="kanban-column" data-stage="New" ondragover="allowLeadDragOver(event)" ondrop="handleLeadDrop(event, 'New')">
+              <div class="column-header">
+                <span class="dot bg-info"></span>
+                <h4>New Lead</h4>
+                <span class="count-badge" id="count-New">0</span>
+              </div>
+              <div class="kanban-cards-wrapper" id="cards-New"></div>
+            </div>
+
+            <div class="kanban-column" data-stage="Contacted" ondragover="allowLeadDragOver(event)" ondrop="handleLeadDrop(event, 'Contacted')">
+              <div class="column-header">
+                <span class="dot bg-warning"></span>
+                <h4>Contacted</h4>
+                <span class="count-badge" id="count-Contacted">0</span>
+              </div>
+              <div class="kanban-cards-wrapper" id="cards-Contacted"></div>
+            </div>
+
+            <div class="kanban-column" data-stage="Qualified" ondragover="allowLeadDragOver(event)" ondrop="handleLeadDrop(event, 'Qualified')">
+              <div class="column-header">
+                <span class="dot bg-indigo"></span>
+                <h4>Qualified</h4>
+                <span class="count-badge" id="count-Qualified">0</span>
+              </div>
+              <div class="kanban-cards-wrapper" id="cards-Qualified"></div>
+            </div>
+
+            <div class="kanban-column" data-stage="Proposal" ondragover="allowLeadDragOver(event)" ondrop="handleLeadDrop(event, 'Proposal')">
+              <div class="column-header">
+                <span class="dot bg-purple"></span>
+                <h4>Proposal Sent</h4>
+                <span class="count-badge" id="count-Proposal">0</span>
+              </div>
+              <div class="kanban-cards-wrapper" id="cards-Proposal"></div>
+            </div>
+
+            <div class="kanban-column" data-stage="Won" ondragover="allowLeadDragOver(event)" ondrop="handleLeadDrop(event, 'Won')">
+              <div class="column-header">
+                <span class="dot bg-success"></span>
+                <h4>Deal Won</h4>
+                <span class="count-badge" id="count-Won">0</span>
+              </div>
+              <div class="kanban-cards-wrapper" id="cards-Won"></div>
+            </div>
+
+            <div class="kanban-column" data-stage="Lost" ondragover="allowLeadDragOver(event)" ondrop="handleLeadDrop(event, 'Lost')">
+              <div class="column-header">
+                <span class="dot bg-danger"></span>
+                <h4>Deal Lost</h4>
+                <span class="count-badge" id="count-Lost">0</span>
+              </div>
+              <div class="kanban-cards-wrapper" id="cards-Lost"></div>
+            </div>
+          </div>
+
+          <!-- List View Table -->
+          <div id="leads-list-view" class="content-card" style="display: none;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Lead Name</th>
+                    <th>Company</th>
+                    <th>Email / Phone</th>
+                    <th>Budget</th>
+                    <th>Priority</th>
+                    <th>Stage</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="leads-list-tbody">
+                  <!-- Loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: SPEECH LEAD ENTRY (SPEECH TO TEXT) -->
+        <div id="tab-user-speech" class="tab-panel">
+          <div class="tab-title-row">
+            <div>
+              <h2>Voice Lead Entry</h2>
+              <p class="subtitle-text">Dictate your lead info. Speak naturally; our AI extractor will pull names, emails, phones, and budgets.</p>
+            </div>
+          </div>
+
+          <!-- Speech-to-Text Container -->
+          <div class="speech-layout">
+            <!-- Left Side: Voice Recorder Console -->
+            <div class="content-card speech-console-card">
+              <div class="speech-status-banner" id="speech-status-banner">
+                <span class="status-indicator-dot green animate-pulse" style="display: none;"></span>
+                <span id="speech-status-text">Click the mic below to start recording</span>
+              </div>
+
+              <!-- Waveform Animation -->
+              <div class="voice-wave-container" id="voice-wave">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+              </div>
+
+              <!-- Main Mic Buttons -->
+              <div class="mic-button-row">
+                <button class="btn-record-mic" id="btn-record-stt" onclick="toggleSttRecording()">
+                  <i data-lucide="mic" id="mic-icon-stt"></i>
+                </button>
+              </div>
+
+              <!-- Live Transcript Box -->
+              <div class="transcript-box">
+                <label>Real-time Transcript</label>
+                <textarea id="stt-transcript-output" placeholder="Your speech will appear here in real-time... If your browser doesn't support speech-to-text, you can paste/type notes here to test the NLP extractor!" rows="5"></textarea>
+              </div>
+
+              <div class="speech-actions">
+                <button class="btn btn-outline" onclick="clearSttTranscript()">Clear</button>
+                <button class="btn btn-emerald" id="btn-parse-stt" onclick="parseTranscriptAndFill()" disabled>
+                  <i data-lucide="sparkles"></i> <span>Extract & Parse Lead</span>
+                </button>
+              </div>
+
+              <div class="instruction-box">
+                <h4>💡 Speech Tips (Try saying these):</h4>
+                <ul>
+                  <li>"Add a new hot lead named <strong>Tony Stark</strong> from <strong>Stark Industries</strong>. Email is <strong>tony@stark.com</strong>, phone number is <strong>555-1234</strong>, budget is <strong>150000</strong> dollars."</li>
+                  <li>"Create a prospect named <strong>Bruce Wayne</strong> from <strong>Wayne Enterprises</strong>. Email is <strong>bruce@wayne.co</strong>, phone number <strong>8889991212</strong>, budget is <strong>95000</strong>."</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Right Side: AI Extraction Review Form -->
+            <div class="content-card speech-form-card">
+              <div class="card-header">
+                <h3>Extracted Data Review</h3>
+                <span class="badge badge-emerald-light"><i data-lucide="sparkles"></i> Verified by AI</span>
+              </div>
+              <div class="card-body">
+                <form id="stt-review-form" onsubmit="saveSttLead(event)">
+                  <div class="form-row-2">
+                    <div class="form-group">
+                      <label for="stt-lead-name">Contact Name <span class="text-danger">*</span></label>
+                      <input type="text" id="stt-lead-name" placeholder="Waiting for extraction..." required>
+                    </div>
+                    <div class="form-group">
+                      <label for="stt-lead-company">Company</label>
+                      <input type="text" id="stt-lead-company" placeholder="Waiting for extraction...">
+                    </div>
+                  </div>
+
+                  <div class="form-row-2">
+                    <div class="form-group">
+                      <label for="stt-lead-email">Email Address</label>
+                      <input type="email" id="stt-lead-email" placeholder="Waiting for extraction...">
+                    </div>
+                    <div class="form-group">
+                      <label for="stt-lead-phone">Phone Number</label>
+                      <input type="text" id="stt-lead-phone" placeholder="Waiting for extraction...">
+                    </div>
+                  </div>
+
+                  <div class="form-row-3">
+                    <div class="form-group">
+                      <label for="stt-lead-budget">Estimated Budget ($)</label>
+                      <input type="number" id="stt-lead-budget" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="stt-lead-priority">Priority</label>
+                      <select id="stt-lead-priority">
+                        <option value="Low">Low</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="High">High</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="stt-lead-status">Initial Stage</label>
+                      <select id="stt-lead-status">
+                        <option value="New" selected>New</option>
+                        <option value="Contacted">Contacted</option>
+                        <option value="Qualified">Qualified</option>
+                        <option value="Proposal">Proposal</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="stt-lead-notes">Full Notes / Speech Log</label>
+                    <textarea id="stt-lead-notes" rows="3" placeholder="Original voice text will be saved as notes..."></textarea>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-save-stt-lead" disabled>
+                    <i data-lucide="save"></i> Save Extracted Lead to Pipeline
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: USER FOLLOW-UPS (CALENDAR / TASK LIST) -->
+        <div id="tab-user-followups" class="tab-panel">
+          <div class="tab-title-row">
+            <div>
+              <h2>Follow-up Manager</h2>
+              <p class="subtitle-text">Keep track of demos, discovery calls, and emails with prospects.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openFollowupModal()">
+              <i data-lucide="plus"></i> Schedule Follow-up
+            </button>
+          </div>
+
+          <!-- Split layout: Add Follow-up & Tasks List -->
+          <div class="followups-layout">
+            <!-- Pending tasks -->
+            <div class="content-card">
+              <div class="card-header">
+                <h3>Pending Tasks</h3>
+              </div>
+              <div class="card-body">
+                <div class="task-list" id="followups-pending-list">
+                  <!-- Loaded dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Completed tasks -->
+            <div class="content-card">
+              <div class="card-header">
+                <h3>Completed Tasks</h3>
+              </div>
+              <div class="card-body">
+                <div class="task-list" id="followups-completed-list">
+                  <!-- Loaded dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: USER BILLING & PLANS (SAAS UPGRADES) -->
+        <div id="tab-user-billing" class="tab-panel">
+          <div class="tab-title-row">
+            <div>
+              <h2>Billing & Subscriptions</h2>
+              <p class="subtitle-text">Manage your current workspace plan. Upgrade to unlock Speech-to-Text and more capacity.</p>
+            </div>
+          </div>
+
+          <!-- Current plan display card -->
+          <div class="content-card current-plan-card">
+            <div class="current-plan-header">
+              <div>
+                <span class="badge badge-indigo">Current Membership</span>
+                <h3 id="billing-current-plan-name">Free Starter</h3>
+                <p class="text-muted">Registered on: <span id="billing-current-plan-date">-</span></p>
+              </div>
+              <div class="current-plan-price">
+                <h2 id="billing-current-plan-price">$0<span>/mo</span></h2>
+                <span class="status-badge success" id="billing-current-plan-status">Active</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-header text-left mt-8">
+            <h3>Available Upgrade Plans</h3>
+            <p>Upgrade in one click. Simulated Stripe checkout is enabled for testing.</p>
+          </div>
+
+          <div class="pricing-grid mt-4" id="billing-pricing-cards">
+            <!-- Loaded dynamically -->
+          </div>
+        </div>
+
+
+        <!-- ================= ADMIN TABS ================= -->
+
+        <!-- TAB: ADMIN DASHBOARD -->
+        <div id="tab-admin-dashboard" class="tab-panel">
+          <div class="tab-title-row">
+            <div>
+              <h2>SaaS Business Overview</h2>
+              <p class="subtitle-text">Analyze platform revenue, user registration metrics, and speech-to-text platform usage.</p>
+            </div>
+          </div>
+
+          <!-- Admin Main Stats -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-icon-box bg-success-light text-success">
+                <i data-lucide="banknote"></i>
+              </div>
+              <div class="metric-info">
+                <h3>Monthly Recurring Revenue</h3>
+                <p class="metric-value" id="admin-stat-mrr">$0</p>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-box bg-indigo-light text-indigo">
+                <i data-lucide="users"></i>
+              </div>
+              <div class="metric-info">
+                <h3>Total CRM Users</h3>
+                <p class="metric-value" id="admin-stat-users">0</p>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-box bg-purple-light text-purple">
+                <i data-lucide="mic"></i>
+              </div>
+              <div class="metric-info">
+                <h3>Speech API Intake Logs</h3>
+                <p class="metric-value" id="admin-stat-stt">0</p>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-box bg-info-light text-info">
+                <i data-lucide="user-check"></i>
+              </div>
+              <div class="metric-info">
+                <h3>Total Leads Generated</h3>
+                <p class="metric-value" id="admin-stat-leads">0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts and logs split -->
+          <div class="admin-charts-grid">
+            <!-- Revenue Area Chart -->
+            <div class="content-card">
+              <div class="card-header">
+                <h3>SaaS Revenue Growth</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="chart-revenue"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Doughnut Plan Breakdown -->
+            <div class="content-card">
+              <div class="card-header">
+                <h3>Active Subscriptions Breakdown</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="chart-plans"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Activity Log (All Users) -->
+          <div class="content-card mt-6">
+            <div class="card-header">
+              <h3>Live Activity Feed</h3>
+              <span class="badge badge-indigo-light">Real-time SaaS Logs</span>
+            </div>
+            <div class="card-body">
+              <div class="activity-feed-wrapper" id="admin-activity-feed">
+                <!-- Dynamically loaded activities -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: ADMIN PLANS MANAGER -->
+        <div id="tab-admin-plans" class="tab-panel">
+          <div class="tab-title-row">
+            <div>
+              <h2>CRM SaaS Plan Settings</h2>
+              <p class="subtitle-text">Add, edit, or toggle plans. Changes propagate instantly to the landing page and user checkout panels.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openPlanModal()">
+              <i data-lucide="plus"></i> Add New Plan
+            </button>
+          </div>
+
+          <!-- Plans Table -->
+          <div class="content-card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Plan Name</th>
+                    <th>Price</th>
+                    <th>Billing Cycle</th>
+                    <th>Key Features</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-plans-tbody">
+                  <!-- Loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: ADMIN USER ACTIVITY -->
+        <div id="tab-admin-users" class="tab-panel">
+          <div class="tab-title-row">
+            <div>
+              <h2>User Workspace Activity Monitor</h2>
+              <p class="subtitle-text">Inspect CRM usage metrics, total leads managed, and Speech-to-Text calls executed by each client.</p>
+            </div>
+          </div>
+
+          <!-- Users Table -->
+          <div class="content-card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>User Details</th>
+                    <th>Active Plan</th>
+                    <th>Total Leads</th>
+                    <th>Speech-to-Text Usage</th>
+                    <th>Date Registered</th>
+                    <th>Last Active</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-tbody">
+                  <!-- Loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: ADMIN REVENUE TRANSACTIONS -->
+        <div id="tab-admin-transactions" class="tab-panel">
+          <div class="tab-title-row">
+            <div>
+              <h2>SaaS Transactions Ledger</h2>
+              <p class="subtitle-text">Audit all subscription purchases, renewals, and invoice records.</p>
+            </div>
+          </div>
+
+          <!-- Transactions Table -->
+          <div class="content-card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Invoice No</th>
+                    <th>Client Name</th>
+                    <th>Purchased Plan</th>
+                    <th>Amount Paid</th>
+                    <th>Billing Cycle</th>
+                    <th>Timestamp</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-transactions-tbody">
+                  <!-- Loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+
+  <!-- MODAL: ADD / EDIT LEAD -->
+  <div class="modal-backdrop" id="modal-lead">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-lead-title">Add New Lead</h3>
+        <button class="btn-close-modal" onclick="closeLeadModal()"><i data-lucide="x"></i></button>
+      </div>
+      <form id="lead-form" onsubmit="handleLeadSubmit(event)">
+        <input type="hidden" id="lead-form-id">
+        <div class="modal-body">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="lead-name">Name <span class="text-danger">*</span></label>
+              <input type="text" id="lead-name" placeholder="John Doe" required>
+            </div>
+            <div class="form-group">
+              <label for="lead-company">Company</label>
+              <input type="text" id="lead-company" placeholder="Acme Corp">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="lead-email">Email Address</label>
+              <input type="email" id="lead-email" placeholder="john@company.com">
+            </div>
+            <div class="form-group">
+              <label for="lead-phone">Phone Number</label>
+              <input type="text" id="lead-phone" placeholder="+1 (555) 000-0000">
+            </div>
+          </div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label for="lead-budget">Budget ($)</label>
+              <input type="number" id="lead-budget" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label for="lead-priority">Priority</label>
+              <select id="lead-priority">
+                <option value="Low">Low</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="lead-status">Sales Stage</label>
+              <select id="lead-status">
+                <option value="New" selected>New</option>
+                <option value="Contacted">Contacted</option>
+                <option value="Qualified">Qualified</option>
+                <option value="Proposal">Proposal</option>
+                <option value="Won">Won</option>
+                <option value="Lost">Lost</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="lead-notes">Notes / Activities</label>
+            <textarea id="lead-notes" rows="4" placeholder="Enter notes about this lead..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeLeadModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-lead">Save Lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- MODAL: SCHEDULE FOLLOW-UP -->
+  <div class="modal-backdrop" id="modal-followup">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Schedule New Follow-up</h3>
+        <button class="btn-close-modal" onclick="closeFollowupModal()"><i data-lucide="x"></i></button>
+      </div>
+      <form id="followup-form" onsubmit="handleFollowupSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="followup-lead">Select Lead (Optional)</label>
+            <select id="followup-lead">
+              <option value="">-- General / No Lead Link --</option>
+              <!-- Loaded dynamically -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="followup-title">Task Title <span class="text-danger">*</span></label>
+            <input type="text" id="followup-title" placeholder="e.g., Send proposal feedback, Demo call" required>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="followup-date">Due Date <span class="text-danger">*</span></label>
+              <input type="date" id="followup-date" required>
+            </div>
+            <div class="form-group">
+              <label for="followup-time">Due Time</label>
+              <input type="time" id="followup-time" value="09:00">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeFollowupModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Schedule Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- MODAL: ADD / EDIT SaaS PLAN (ADMIN ONLY) -->
+  <div class="modal-backdrop" id="modal-plan">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-plan-title">Create New SaaS Plan</h3>
+        <button class="btn-close-modal" onclick="closePlanModal()"><i data-lucide="x"></i></button>
+      </div>
+      <form id="plan-form" onsubmit="handlePlanSubmit(event)">
+        <input type="hidden" id="plan-form-id">
+        <div class="modal-body">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="plan-name">Plan Name <span class="text-danger">*</span></label>
+              <input type="text" id="plan-name" placeholder="e.g., Growth Pro" required>
+            </div>
+            <div class="form-group">
+              <label for="plan-price">Monthly Price ($) <span class="text-danger">*</span></label>
+              <input type="number" id="plan-price" placeholder="e.g., 29" min="0" required>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="plan-billing">Billing Frequency</label>
+              <select id="plan-billing">
+                <option value="monthly" selected>Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="plan-status">Status</label>
+              <select id="plan-status">
+                <option value="active" selected>Active / Visible</option>
+                <option value="inactive">Inactive / Hidden</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="plan-features">Key Features (One per line) <span class="text-danger">*</span></label>
+            <textarea id="plan-features" rows="5" placeholder="e.g.&#13;Unlimited Leads&#13;Speech-to-Text Entry&#13;Advanced Reports" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closePlanModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-plan">Save Plan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- MODAL: SIMULATED PAYMENT (CHECKOUT) -->
+  <div class="modal-backdrop" id="modal-checkout">
+    <div class="modal-card checkout-modal-card">
+      <div class="modal-header">
+        <h3>Simulated Stripe Checkout</h3>
+        <button class="btn-close-modal" onclick="closeCheckoutModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="checkout-summary-box">
+          <p>You are upgrading to:</p>
+          <h2 id="checkout-plan-name">Growth Pro</h2>
+          <p class="checkout-amount" id="checkout-plan-price">$29<span>/month</span></p>
+        </div>
+
+        <div class="checkout-card-form">
+          <div class="form-group">
+            <label>Cardholder Name</label>
+            <input type="text" id="checkout-card-name" value="Shivam Rawat" placeholder="Cardholder Name">
+          </div>
+          <div class="form-group">
+            <label>Card Details</label>
+            <div class="input-wrapper">
+              <i data-lucide="credit-card" class="input-icon"></i>
+              <input type="text" value="4242 •••• •••• 4242" placeholder="4242 4242 4242 4242" readonly>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Expiry Date</label>
+              <input type="text" value="12/28" placeholder="MM/YY" readonly>
+            </div>
+            <div class="form-group">
+              <label>CVC</label>
+              <input type="text" value="***" placeholder="123" readonly>
+            </div>
+          </div>
+        </div>
+
+        <div class="checkout-security-badge">
+          <i data-lucide="shield-check" class="text-success"></i>
+          <span>Secure simulated checkout environment. No money will be charged.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeCheckoutModal()">Cancel</button>
+        <button type="button" class="btn btn-primary btn-lg" id="btn-confirm-checkout" onclick="executeSubscriptionPurchase()">
+          <span id="checkout-btn-text">Pay & Subscribe</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
