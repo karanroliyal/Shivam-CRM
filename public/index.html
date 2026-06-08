@@ -14,10 +14,13 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <!-- Chart.js for Admin Panel analytics -->
+  <!-- Chart.js for data visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- App Stylesheet -->
+  <!-- Razorpay Checkout JS -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- Google Fonts for typography -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -215,11 +218,7 @@
           <i data-lucide="kanban"></i>
           <span>Leads Board</span>
         </a>
-        <a href="#" class="nav-item" onclick="switchTab('user-speech')">
-          <i data-lucide="mic"></i>
-          <span>Speech Entry</span>
-          <span class="badge badge-emerald-light float-right">AI</span>
-        </a>
+
         <a href="#" class="nav-item" onclick="switchTab('user-followups')">
           <i data-lucide="calendar"></i>
           <span>Follow-ups</span>
@@ -249,6 +248,10 @@
           <i data-lucide="banknote"></i>
           <span>Income / Revenue</span>
         </a>
+        <a href="#" class="nav-item" onclick="switchTab('admin-settings')">
+          <i data-lucide="settings"></i>
+          <span>Configuration</span>
+        </a>
       </nav>
 
       <!-- Sidebar User Profile Area -->
@@ -275,12 +278,6 @@
           <input type="text" id="global-search" placeholder="Search leads, companies..." oninput="handleGlobalSearch(this.value)">
         </div>
         <div class="header-actions">
-          <!-- Quick Speech Button for CRM user -->
-          <button class="btn btn-emerald flex items-center gap-1" id="header-voice-btn" onclick="switchTab('user-speech')">
-            <i data-lucide="mic"></i>
-            <span>Voice Lead</span>
-          </button>
-          
           <button class="btn btn-primary" id="header-add-lead-btn" onclick="openLeadModal()">
             <i data-lucide="plus"></i>
             <span>Add Lead</span>
@@ -478,134 +475,7 @@
           </div>
         </div>
 
-        <!-- TAB: SPEECH LEAD ENTRY (SPEECH TO TEXT) -->
-        <div id="tab-user-speech" class="tab-panel">
-          <div class="tab-title-row">
-            <div>
-              <h2>Voice Lead Entry</h2>
-              <p class="subtitle-text">Dictate your lead info. Speak naturally; our AI extractor will pull names, emails, phones, and budgets.</p>
-            </div>
-          </div>
 
-          <!-- Speech-to-Text Container -->
-          <div class="speech-layout">
-            <!-- Left Side: Voice Recorder Console -->
-            <div class="content-card speech-console-card">
-              <div class="speech-status-banner" id="speech-status-banner">
-                <span class="status-indicator-dot green animate-pulse" style="display: none;"></span>
-                <span id="speech-status-text">Click the mic below to start recording</span>
-              </div>
-
-              <!-- Waveform Animation -->
-              <div class="voice-wave-container" id="voice-wave">
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-              </div>
-
-              <!-- Main Mic Buttons -->
-              <div class="mic-button-row">
-                <button class="btn-record-mic" id="btn-record-stt" onclick="toggleSttRecording()">
-                  <i data-lucide="mic" id="mic-icon-stt"></i>
-                </button>
-              </div>
-
-              <!-- Live Transcript Box -->
-              <div class="transcript-box">
-                <label>Real-time Transcript</label>
-                <textarea id="stt-transcript-output" placeholder="Your speech will appear here in real-time... If your browser doesn't support speech-to-text, you can paste/type notes here to test the NLP extractor!" rows="5"></textarea>
-              </div>
-
-              <div class="speech-actions">
-                <button class="btn btn-outline" onclick="clearSttTranscript()">Clear</button>
-                <button class="btn btn-emerald" id="btn-parse-stt" onclick="parseTranscriptAndFill()" disabled>
-                  <i data-lucide="sparkles"></i> <span>Extract & Parse Lead</span>
-                </button>
-              </div>
-
-              <div class="instruction-box">
-                <h4>💡 Speech Tips (Try saying these):</h4>
-                <ul>
-                  <li>"Add a new hot lead named <strong>Tony Stark</strong> from <strong>Stark Industries</strong>. Email is <strong>tony@stark.com</strong>, phone number is <strong>555-1234</strong>, budget is <strong>150000</strong> dollars."</li>
-                  <li>"Create a prospect named <strong>Bruce Wayne</strong> from <strong>Wayne Enterprises</strong>. Email is <strong>bruce@wayne.co</strong>, phone number <strong>8889991212</strong>, budget is <strong>95000</strong>."</li>
-                </ul>
-              </div>
-            </div>
-
-            <!-- Right Side: AI Extraction Review Form -->
-            <div class="content-card speech-form-card">
-              <div class="card-header">
-                <h3>Extracted Data Review</h3>
-                <span class="badge badge-emerald-light"><i data-lucide="sparkles"></i> Verified by AI</span>
-              </div>
-              <div class="card-body">
-                <form id="stt-review-form" onsubmit="saveSttLead(event)">
-                  <div class="form-row-2">
-                    <div class="form-group">
-                      <label for="stt-lead-name">Contact Name <span class="text-danger">*</span></label>
-                      <input type="text" id="stt-lead-name" placeholder="Waiting for extraction..." required>
-                    </div>
-                    <div class="form-group">
-                      <label for="stt-lead-company">Company</label>
-                      <input type="text" id="stt-lead-company" placeholder="Waiting for extraction...">
-                    </div>
-                  </div>
-
-                  <div class="form-row-2">
-                    <div class="form-group">
-                      <label for="stt-lead-email">Email Address</label>
-                      <input type="email" id="stt-lead-email" placeholder="Waiting for extraction...">
-                    </div>
-                    <div class="form-group">
-                      <label for="stt-lead-phone">Phone Number</label>
-                      <input type="text" id="stt-lead-phone" placeholder="Waiting for extraction...">
-                    </div>
-                  </div>
-
-                  <div class="form-row-3">
-                    <div class="form-group">
-                      <label for="stt-lead-budget">Estimated Budget ($)</label>
-                      <input type="number" id="stt-lead-budget" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                      <label for="stt-lead-priority">Priority</label>
-                      <select id="stt-lead-priority">
-                        <option value="Low">Low</option>
-                        <option value="Medium" selected>Medium</option>
-                        <option value="High">High</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="stt-lead-status">Initial Stage</label>
-                      <select id="stt-lead-status">
-                        <option value="New" selected>New</option>
-                        <option value="Contacted">Contacted</option>
-                        <option value="Qualified">Qualified</option>
-                        <option value="Proposal">Proposal</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="stt-lead-notes">Full Notes / Speech Log</label>
-                    <textarea id="stt-lead-notes" rows="3" placeholder="Original voice text will be saved as notes..."></textarea>
-                  </div>
-
-                  <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-save-stt-lead" disabled>
-                    <i data-lucide="save"></i> Save Extracted Lead to Pipeline
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- TAB: USER FOLLOW-UPS (CALENDAR / TASK LIST) -->
         <div id="tab-user-followups" class="tab-panel">
@@ -701,7 +571,7 @@
               </div>
               <div class="metric-info">
                 <h3>Monthly Recurring Revenue</h3>
-                <p class="metric-value" id="admin-stat-mrr">$0</p>
+                <p class="metric-value" id="admin-stat-mrr">₹0</p>
               </div>
             </div>
             <div class="metric-card">
@@ -715,11 +585,11 @@
             </div>
             <div class="metric-card">
               <div class="metric-icon-box bg-purple-light text-purple">
-                <i data-lucide="mic"></i>
+                <i data-lucide="receipt"></i>
               </div>
               <div class="metric-info">
-                <h3>Speech API Intake Logs</h3>
-                <p class="metric-value" id="admin-stat-stt">0</p>
+                <h3>Total Transactions</h3>
+                <p class="metric-value" id="admin-stat-tx">0</p>
               </div>
             </div>
             <div class="metric-card">
@@ -847,19 +717,17 @@
               <p class="subtitle-text">Audit all subscription purchases, renewals, and invoice records.</p>
             </div>
           </div>
-
-          <!-- Transactions Table -->
-          <div class="content-card">
+          <div class="content-card mt-2">
             <div class="table-responsive">
               <table class="data-table">
                 <thead>
                   <tr>
                     <th>Invoice No</th>
-                    <th>Client Name</th>
-                    <th>Purchased Plan</th>
-                    <th>Amount Paid</th>
-                    <th>Billing Cycle</th>
-                    <th>Timestamp</th>
+                    <th>Customer</th>
+                    <th>Plan Purchased</th>
+                    <th>Cycle</th>
+                    <th>Amount (₹)</th>
+                    <th>Date & Time</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -871,7 +739,37 @@
           </div>
         </div>
 
-      </div>
+        <!-- TAB: ADMIN SETTINGS -->
+        <div id="tab-admin-settings" class="tab-panel">
+          <div class="tab-title-row">
+            <div>
+              <h2>Platform Configuration</h2>
+              <p class="subtitle-text">Configure global settings such as Payment Gateway APIs.</p>
+            </div>
+          </div>
+
+          <div class="content-card mt-2" style="max-width: 600px;">
+            <div class="card-header">
+              <h3>Razorpay Payment Gateway</h3>
+            </div>
+            <div class="card-body">
+              <form id="form-admin-razorpay" onsubmit="saveRazorpaySettings(event)">
+                <div class="form-group">
+                  <label>Key ID</label>
+                  <input type="text" id="razorpay-key-id" placeholder="rzp_test_...">
+                </div>
+                <div class="form-group">
+                  <label>Key Secret</label>
+                  <input type="password" id="razorpay-key-secret" placeholder="••••••••••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary" id="btn-save-razorpay">
+                  <i data-lucide="save"></i> Save Configuration
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div> <!-- /app-content-container -->
     </main>
   </div>
 
@@ -889,29 +787,44 @@
           <div class="form-row-2">
             <div class="form-group">
               <label for="lead-name">Name <span class="text-danger">*</span></label>
-              <input type="text" id="lead-name" placeholder="John Doe" required>
+              <div style="display:flex; gap:0.25rem;">
+                <input type="text" id="lead-name" placeholder="John Doe" required style="flex:1;">
+                <button type="button" class="btn btn-outline" style="padding:0 0.5rem;" onclick="dictateInto('lead-name')" title="Dictate Name"><i data-lucide="mic"></i></button>
+              </div>
             </div>
             <div class="form-group">
               <label for="lead-company">Company</label>
-              <input type="text" id="lead-company" placeholder="Acme Corp">
+              <div style="display:flex; gap:0.25rem;">
+                <input type="text" id="lead-company" placeholder="Acme Corp" style="flex:1;">
+                <button type="button" class="btn btn-outline" style="padding:0 0.5rem;" onclick="dictateInto('lead-company')" title="Dictate Company"><i data-lucide="mic"></i></button>
+              </div>
             </div>
           </div>
 
           <div class="form-row-2">
             <div class="form-group">
               <label for="lead-email">Email Address</label>
-              <input type="email" id="lead-email" placeholder="john@company.com">
+              <div style="display:flex; gap:0.25rem;">
+                <input type="email" id="lead-email" placeholder="john@company.com" style="flex:1;">
+                <button type="button" class="btn btn-outline" style="padding:0 0.5rem;" onclick="dictateInto('lead-email')" title="Dictate Email"><i data-lucide="mic"></i></button>
+              </div>
             </div>
             <div class="form-group">
               <label for="lead-phone">Phone Number</label>
-              <input type="text" id="lead-phone" placeholder="+1 (555) 000-0000">
+              <div style="display:flex; gap:0.25rem;">
+                <input type="text" id="lead-phone" placeholder="+1 (555) 000-0000" style="flex:1;">
+                <button type="button" class="btn btn-outline" style="padding:0 0.5rem;" onclick="dictateInto('lead-phone')" title="Dictate Phone"><i data-lucide="mic"></i></button>
+              </div>
             </div>
           </div>
 
           <div class="form-row-3">
             <div class="form-group">
               <label for="lead-budget">Budget ($)</label>
-              <input type="number" id="lead-budget" placeholder="0">
+              <div style="display:flex; gap:0.25rem;">
+                <input type="number" id="lead-budget" placeholder="0" style="flex:1;">
+                <button type="button" class="btn btn-outline" style="padding:0 0.5rem;" onclick="dictateInto('lead-budget')" title="Dictate Budget"><i data-lucide="mic"></i></button>
+              </div>
             </div>
             <div class="form-group">
               <label for="lead-priority">Priority</label>
@@ -936,7 +849,10 @@
 
           <div class="form-group">
             <label for="lead-notes">Notes / Activities</label>
-            <textarea id="lead-notes" rows="4" placeholder="Enter notes about this lead..."></textarea>
+            <div style="display:flex; gap:0.25rem; align-items:flex-start;">
+              <textarea id="lead-notes" rows="4" placeholder="Enter notes about this lead..." style="flex:1;"></textarea>
+              <button type="button" class="btn btn-outline" style="padding:0.5rem;" onclick="dictateInto('lead-notes')" title="Dictate Notes"><i data-lucide="mic"></i></button>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -1042,54 +958,28 @@
   </div>
 
 
-  <!-- MODAL: SIMULATED PAYMENT (CHECKOUT) -->
+  <!-- MODAL: CHECKOUT -->
   <div class="modal-backdrop" id="modal-checkout">
     <div class="modal-card checkout-modal-card">
       <div class="modal-header">
-        <h3>Simulated Stripe Checkout</h3>
+        <h3>Secure Razorpay Checkout</h3>
         <button class="btn-close-modal" onclick="closeCheckoutModal()"><i data-lucide="x"></i></button>
       </div>
       <div class="modal-body">
         <div class="checkout-summary-box">
           <p>You are upgrading to:</p>
           <h2 id="checkout-plan-name">Growth Pro</h2>
-          <p class="checkout-amount" id="checkout-plan-price">$29<span>/month</span></p>
+          <p class="checkout-amount" id="checkout-plan-price">₹29<span>/month</span></p>
         </div>
 
-        <div class="checkout-card-form">
-          <div class="form-group">
-            <label>Cardholder Name</label>
-            <input type="text" id="checkout-card-name" value="Shivam Rawat" placeholder="Cardholder Name">
-          </div>
-          <div class="form-group">
-            <label>Card Details</label>
-            <div class="input-wrapper">
-              <i data-lucide="credit-card" class="input-icon"></i>
-              <input type="text" value="4242 •••• •••• 4242" placeholder="4242 4242 4242 4242" readonly>
-            </div>
-          </div>
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>Expiry Date</label>
-              <input type="text" value="12/28" placeholder="MM/YY" readonly>
-            </div>
-            <div class="form-group">
-              <label>CVC</label>
-              <input type="text" value="***" placeholder="123" readonly>
-            </div>
-          </div>
+        <div class="checkout-card-form text-center mt-3">
+          <p class="text-muted mb-4">Click below to securely complete your payment via Razorpay. We support UPI, Net Banking, and Credit/Debit Cards.</p>
+          <form onsubmit="event.preventDefault(); executeSubscriptionPurchase();">
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-confirm-checkout">
+              <i data-lucide="lock"></i> <span id="checkout-btn-text">Pay Securely via Razorpay</span>
+            </button>
+          </form>
         </div>
-
-        <div class="checkout-security-badge">
-          <i data-lucide="shield-check" class="text-success"></i>
-          <span>Secure simulated checkout environment. No money will be charged.</span>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" onclick="closeCheckoutModal()">Cancel</button>
-        <button type="button" class="btn btn-primary btn-lg" id="btn-confirm-checkout" onclick="executeSubscriptionPurchase()">
-          <span id="checkout-btn-text">Pay & Subscribe</span>
-        </button>
       </div>
     </div>
   </div>

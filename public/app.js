@@ -124,8 +124,6 @@ async function switchTab(tabId) {
       await loadUserDashboardData();
     } else if (tabId === 'user-pipeline') {
       await loadUserLeads();
-    } else if (tabId === 'user-speech') {
-      setupSpeechRecognition();
     } else if (tabId === 'user-followups') {
       await loadUserFollowups();
     } else if (tabId === 'user-billing') {
@@ -138,6 +136,8 @@ async function switchTab(tabId) {
       await loadAdminUsers();
     } else if (tabId === 'admin-transactions') {
       await loadAdminTransactions();
+    } else if (tabId === 'admin-settings') {
+      await loadAdminSettings();
     }
   } catch (err) {
     showToast(err.message, 'danger');
@@ -244,7 +244,6 @@ function updateUserProfileUI() {
   document.getElementById('sidebar-role-badge').className = `user-role-badge ${isAdmin ? 'badge-indigo' : ''}`;
   
   document.getElementById('header-add-lead-btn').style.display = isUser ? 'inline-flex' : 'none';
-  document.getElementById('header-voice-btn').style.display = isUser ? 'inline-flex' : 'none';
   document.getElementById('header-admin-indicator').style.display = isAdmin ? 'flex' : 'none';
   document.getElementById('global-search').style.display = isUser ? 'block' : 'none';
 
@@ -279,37 +278,39 @@ async function loadUserLeads() {
   }
 }
 
-function renderPipelineLeads() {
+function renderPipelineLeads(query = '') {
   if (state.leadViewMode === 'kanban') {
-    renderKanbanLeads();
+    renderKanbanBoard(query);
   } else {
-    renderListLeads();
+    renderListView(query);
   }
 }
 
-function toggleLeadViewMode(mode) {
-  state.leadViewMode = mode;
-  document.getElementById('btn-view-kanban').classList.toggle('active', mode === 'kanban');
-  document.getElementById('btn-view-list').classList.toggle('active', mode === 'list');
-  
-  document.getElementById('leads-kanban-view').style.display = mode === 'kanban' ? 'grid' : 'none';
-  document.getElementById('leads-list-view').style.display = mode === 'list' ? 'block' : 'none';
-
-  renderPipelineLeads();
-}
-
-function renderKanbanLeads() {
+function renderKanbanBoard(query = '') {
   const stages = ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'];
   
   // Clear lists & counts
   stages.forEach(stage => {
-    document.getElementById(`cards-${stage}`).innerHTML = '';
-    document.getElementById(`count-${stage}`).innerText = '0';
+    const el = document.getElementById(`cards-${stage}`);
+    if (el) el.innerHTML = '';
+    const ct = document.getElementById(`count-${stage}`);
+    if (ct) ct.innerText = '0';
   });
+
+  let filteredLeads = state.leads;
+  if (query) {
+    const q = query.toLowerCase();
+    filteredLeads = state.leads.filter(l => 
+      l.name.toLowerCase().includes(q) || 
+      (l.company && l.company.toLowerCase().includes(q)) || 
+      (l.email && l.email.toLowerCase().includes(q)) || 
+      (l.phone && l.phone.toLowerCase().includes(q))
+    );
+  }
 
   const stageCounts = { New: 0, Contacted: 0, Qualified: 0, Proposal: 0, Won: 0, Lost: 0 };
 
-  state.leads.forEach(lead => {
+  filteredLeads.forEach(lead => {
     const container = document.getElementById(`cards-${lead.status}`);
     if (!container) return;
 
@@ -333,22 +334,45 @@ function renderKanbanLeads() {
     container.appendChild(card);
   });
 
-  // Update headers count badges
   stages.forEach(stage => {
-    document.getElementById(`count-${stage}`).innerText = stageCounts[stage];
+    const ct = document.getElementById(`count-${stage}`);
+    if (ct) ct.innerText = stageCounts[stage];
   });
 }
 
-function renderListLeads() {
+function toggleLeadViewMode(mode) {
+  state.leadViewMode = mode;
+  document.getElementById('btn-view-kanban').classList.toggle('active', mode === 'kanban');
+  document.getElementById('btn-view-list').classList.toggle('active', mode === 'list');
+  
+  document.getElementById('leads-kanban-view').style.display = mode === 'kanban' ? 'grid' : 'none';
+  document.getElementById('leads-list-view').style.display = mode === 'list' ? 'block' : 'none';
+
+  renderPipelineLeads(document.getElementById('global-search').value);
+}
+
+function renderListView(query = '') {
   const tbody = document.getElementById('leads-list-tbody');
+  if (!tbody) return;
   tbody.innerHTML = '';
 
-  if (state.leads.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No leads in pipeline. Click "Add Lead" to get started.</td></tr>`;
+  let filteredLeads = state.leads;
+  if (query) {
+    const q = query.toLowerCase();
+    filteredLeads = state.leads.filter(l => 
+      l.name.toLowerCase().includes(q) || 
+      (l.company && l.company.toLowerCase().includes(q)) || 
+      (l.email && l.email.toLowerCase().includes(q)) || 
+      (l.phone && l.phone.toLowerCase().includes(q))
+    );
+  }
+
+  if (filteredLeads.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No leads found.</td></tr>`;
     return;
   }
 
-  state.leads.forEach(lead => {
+  filteredLeads.forEach(lead => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><strong>${escapeHtml(lead.name)}</strong></td>
@@ -590,260 +614,83 @@ async function deleteLead(id) {
   }
 }
 
-// ================= SPEECH-TO-TEXT DICTATION =================
+// ================= SPEECH DICTATION (DIRECT ENTRY) =================
 
-function setupSpeechRecognition() {
-  if (state.recognition) return; // Already setup
-
+function dictateInto(fieldId) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   
   if (!SpeechRecognition) {
-    document.getElementById('speech-status-text').innerHTML = `
-      <span class="text-danger">Web Speech API is not supported by your browser.</span><br/>
-      Please type/paste voice notes directly in the box below to test the parser!
-    `;
-    document.getElementById('btn-record-stt').disabled = true;
-    
-    // Enable manual extraction parsing trigger anytime there is text in box
-    const txtOutput = document.getElementById('stt-transcript-output');
-    txtOutput.addEventListener('input', () => {
-      document.getElementById('btn-parse-stt').disabled = txtOutput.value.trim().length === 0;
-    });
+    showToast('Speech API is not supported by your browser.', 'danger');
     return;
   }
 
   const rec = new SpeechRecognition();
-  rec.continuous = true;
-  rec.interimResults = true;
+  rec.continuous = false;
+  rec.interimResults = false;
   rec.lang = 'en-US';
 
+  const btn = document.querySelector(`button[onclick="dictateInto('${fieldId}')"]`);
+
   rec.onstart = () => {
-    state.sttRecording = true;
-    document.getElementById('speech-status-banner').querySelector('.status-indicator-dot').style.display = 'inline-block';
-    document.getElementById('speech-status-text').innerText = 'Listening... Speak clearly. Click mic to stop.';
-    document.getElementById('btn-record-stt').classList.add('recording');
-    document.getElementById('mic-icon-stt').setAttribute('data-lucide', 'mic-off');
-    document.getElementById('voice-wave').classList.add('recording');
-    lucide.createIcons();
+    showToast('Listening... Speak now.', 'info');
+    if (btn) {
+      btn.classList.add('btn-emerald');
+      btn.classList.remove('btn-outline');
+      const icon = btn.querySelector('svg') || btn.querySelector('i');
+      if (icon) icon.classList.add('animate-pulse');
+    }
   };
 
-  rec.onerror = (event) => {
-    console.error('Speech error:', event.error);
-    showToast(`Speech recognition error: ${event.error}`, 'warning');
-    stopSttRecording();
-  };
+    rec.onerror = (event) => {
+      let errMsg = event.error;
+      if (event.error === 'network') {
+        errMsg = 'Network failed. Some browsers (like Brave) or firewalls block speech services.';
+      } else if (event.error === 'not-allowed') {
+        errMsg = 'Microphone access was denied. Please allow microphone permissions.';
+      }
+      showToast(`Speech error: ${errMsg}`, 'danger');
+      
+      if (btn) {
+        btn.classList.remove('btn-emerald');
+        btn.classList.add('btn-outline');
+        const icon = btn.querySelector('svg') || btn.querySelector('i');
+        if (icon) icon.classList.remove('animate-pulse');
+      }
+    };
 
   rec.onend = () => {
-    stopSttRecording();
+    if (btn) {
+      btn.classList.remove('btn-emerald');
+      btn.classList.add('btn-outline');
+      const icon = btn.querySelector('svg') || btn.querySelector('i');
+      if (icon) icon.classList.remove('animate-pulse');
+    }
   };
 
   rec.onresult = (event) => {
-    let finalTranscript = '';
-    let interimTranscript = '';
-
+    let transcript = '';
     for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) {
-        finalTranscript += event.results[i][0].transcript;
+      transcript += event.results[i][0].transcript;
+    }
+
+    const input = document.getElementById(fieldId);
+    if (input) {
+      if (input.value) {
+        input.value += ' ' + transcript.trim();
       } else {
-        interimTranscript += event.results[i][0].transcript;
+        input.value = transcript.trim();
       }
+      showToast('Speech captured!', 'success');
+      
+      // Log voice activity
+      logUserAction('Speech-to-Text Entry', `Used voice dictation for field: ${fieldId}`);
     }
-
-    const currentText = document.getElementById('stt-transcript-output').value;
-    if (finalTranscript) {
-      document.getElementById('stt-transcript-output').value = currentText ? currentText + ' ' + finalTranscript : finalTranscript;
-      document.getElementById('btn-parse-stt').disabled = false;
-    }
-  };
-
-  state.recognition = rec;
-}
-
-function toggleSttRecording() {
-  if (state.sttRecording) {
-    state.recognition.stop();
-    stopSttRecording();
-  } else {
-    // Check if browser restricts permissions before start
-    setupSpeechRecognition();
-    if (state.recognition) {
-      try {
-        state.recognition.start();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  }
-}
-
-function stopSttRecording() {
-  state.sttRecording = false;
-  document.getElementById('speech-status-banner').querySelector('.status-indicator-dot').style.display = 'none';
-  document.getElementById('speech-status-text').innerText = 'Recording stopped. Review transcript and click extract.';
-  document.getElementById('btn-record-stt').classList.remove('recording');
-  document.getElementById('mic-icon-stt').setAttribute('data-lucide', 'mic');
-  document.getElementById('voice-wave').classList.remove('recording');
-  
-  const text = document.getElementById('stt-transcript-output').value.trim();
-  document.getElementById('btn-parse-stt').disabled = text.length === 0;
-  lucide.createIcons();
-}
-
-function clearSttTranscript() {
-  document.getElementById('stt-transcript-output').value = '';
-  document.getElementById('btn-parse-stt').disabled = true;
-  document.getElementById('btn-save-stt-lead').disabled = true;
-  document.getElementById('stt-review-form').reset();
-}
-
-// Speech NLP extractor client logic
-function parseTranscriptAndFill() {
-  const text = document.getElementById('stt-transcript-output').value.trim();
-  if (!text) return;
-
-  showToast('AI: Extracting entities from voice transcript...', 'info');
-
-  const parsed = extractLeadInfo(text);
-
-  // Fill in form reviews
-  document.getElementById('stt-lead-name').value = parsed.name || 'Anonymous Prospect';
-  document.getElementById('stt-lead-company').value = parsed.company;
-  document.getElementById('stt-lead-email').value = parsed.email;
-  document.getElementById('stt-lead-phone').value = parsed.phone;
-  document.getElementById('stt-lead-budget').value = parsed.budget || '';
-  document.getElementById('stt-lead-priority').value = parsed.priority;
-  document.getElementById('stt-lead-status').value = parsed.status;
-  document.getElementById('stt-lead-notes').value = `Voice Transcription Log:\n"${text}"\n\nAdditional Notes:`;
-
-  document.getElementById('btn-save-stt-lead').disabled = false;
-  showToast('Lead details successfully extracted! Please review and save.', 'success');
-
-  // Log voice activity call to server backend
-  logUserAction('Speech-to-Text Lead Entry', `Transcribed and parsed voice lead: "${parsed.name || 'Anonymous'}"`);
-}
-
-function extractLeadInfo(text) {
-  const info = {
-    name: '',
-    company: '',
-    email: '',
-    phone: '',
-    budget: '',
-    priority: 'Medium',
-    status: 'New',
-    notes: text
-  };
-
-  // 1. Email matching
-  const emailMatch = text.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
-  if (emailMatch) {
-    info.email = emailMatch[1];
-  }
-
-  // 2. Phone matching
-  const phoneMatch = text.match(/(\+?\d{1,4}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4,6}/);
-  if (phoneMatch) {
-    info.phone = phoneMatch[0];
-  }
-
-  // 3. Budget matching
-  const budgetMatch = text.match(/(?:budget of|budget is|budget|around|worth)\s*(?:\$|rs\.?|inr)?\s*(\d+[,.]?\d*)\s*(?:dollars|rupees|usd|inr|k)?/i) ||
-                      text.match(/(?:\$|rs\.?|inr)\s*(\d+[,.]?\d*)/i);
-  if (budgetMatch) {
-    let rawBudget = budgetMatch[1].replace(/,/g, '');
-    let val = parseFloat(rawBudget);
-    if (budgetMatch[0].toLowerCase().includes('k')) val *= 1000;
-    info.budget = val;
-  }
-
-  // 4. Priority matching
-  if (/high priority|urgent|critical|hot lead/i.test(text)) {
-    info.priority = 'High';
-  } else if (/low priority|cold lead|not urgent/i.test(text)) {
-    info.priority = 'Low';
-  } else if (/medium priority|warm lead/i.test(text)) {
-    info.priority = 'Medium';
-  }
-
-  // 5. Name & Company extraction using common sentence structures
-  // "lead named John Doe from Google", "add John Doe working at Microsoft", "contact is John Doe from Acme"
-  const nameCompanyPatterns = [
-    /named?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)(?:\s+from\s+([A-Za-z0-9\s]+))?/i,
-    /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+from\s+([A-Za-z0-9\s]+(?:Corp|Inc|Technologies|Industries|Co|Ltd|Systems|Software|Museum)?)/,
-    /contact\s+(?:person\s+is\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)(?:\s+at\s+([A-Za-z0-9\s]+))?/i
-  ];
-
-  for (const pattern of nameCompanyPatterns) {
-    const match = text.match(pattern);
-    if (match) {
-      if (match[1] && !info.name) {
-        info.name = match[1].trim();
-      }
-      if (match[2] && !info.company) {
-        info.company = match[2].trim();
-      }
-    }
-  }
-
-  // Fallback: If no name found, look for capitalized words that could be a name
-  if (!info.name) {
-    const nameMatch = text.match(/(?:this is|called|contact|client|customer)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/);
-    if (nameMatch) {
-      info.name = nameMatch[1];
-    } else {
-      // Just take the first two capitalized words as name, if any
-      const words = text.match(/[A-Z][a-z]+/g);
-      if (words && words.length >= 2) {
-        info.name = `${words[0]} ${words[1]}`;
-      } else if (words && words.length === 1) {
-        info.name = words[0];
-      }
-    }
-  }
-
-  // Fallback for company
-  if (!info.company) {
-    const companyMatch = text.match(/(?:at|company|works for|representing|from)\s+([A-Z][A-Za-z0-9]+)/);
-    if (companyMatch) {
-      info.company = companyMatch[1];
-    }
-  }
-
-  return info;
-}
-
-async function saveSttLead(e) {
-  e.preventDefault();
-  
-  // Check Plan limits for voice leads
-  if (state.currentUser.planId === 'plan_free') {
-    showToast('Voice Intake Feature requires Growth Pro or Enterprise plan. Upgrade billing now!', 'warning');
-    switchTab('user-billing');
-    return;
-  }
-
-  const payload = {
-    name: document.getElementById('stt-lead-name').value,
-    company: document.getElementById('stt-lead-company').value,
-    email: document.getElementById('stt-lead-email').value,
-    phone: document.getElementById('stt-lead-phone').value,
-    budget: Number(document.getElementById('stt-lead-budget').value) || 0,
-    priority: document.getElementById('stt-lead-priority').value,
-    status: document.getElementById('stt-lead-status').value,
-    notes: document.getElementById('stt-lead-notes').value
   };
 
   try {
-    const created = await apiFetch('/api/crm/leads', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-    
-    showToast(`Lead "${created.name}" created from speech intake!`, 'success');
-    clearSttTranscript();
-    switchTab('user-pipeline');
-  } catch (err) {
-    showToast(err.message, 'danger');
+    rec.start();
+  } catch (e) {
+    console.error(e);
   }
 }
 
@@ -1071,7 +918,7 @@ async function loadUserDashboardData() {
     document.getElementById('user-stat-total-leads').innerText = leads.length;
     document.getElementById('user-stat-hot-leads').innerText = hotLeadsCount;
     document.getElementById('user-stat-pending-followups').innerText = pendingFollowups;
-    document.getElementById('user-stat-pipeline-value').innerText = '$' + totalPipelineVal.toLocaleString();
+    document.getElementById('user-stat-pipeline-value').innerText = '₹' + totalPipelineVal.toLocaleString();
 
     // Render Followups scheduled for today
     renderDashboardFollowups(followups);
@@ -1079,6 +926,8 @@ async function loadUserDashboardData() {
     // Render Pipeline stages breakdown list
     renderDashboardPipelineSummary(leads);
 
+    // Ensure icons are created for the dashboard
+    lucide.createIcons();
   } catch (err) {
     showToast(err.message, 'danger');
   }
@@ -1093,6 +942,7 @@ function renderDashboardFollowups(followups) {
 
   if (todaysFollowups.length === 0) {
     container.innerHTML = `<p class="text-muted text-center py-4">No tasks scheduled for today.</p>`;
+    lucide.createIcons();
     return;
   }
 
@@ -1158,7 +1008,7 @@ async function loadBillingTabPlans() {
     const activePlan = plans.find(p => p.id === user.planId) || { name: 'Free Starter', price: 0, billingCycle: 'monthly' };
     
     document.getElementById('billing-current-plan-name').innerText = activePlan.name;
-    document.getElementById('billing-current-plan-price').innerText = `$${activePlan.price}`;
+    document.getElementById('billing-current-plan-price').innerText = `₹${activePlan.price}`;
     document.getElementById('billing-current-plan-date').innerText = new Date(user.planStartDate).toLocaleDateString();
 
     // Render upgrade offers (hide currently owned plan)
@@ -1181,7 +1031,7 @@ async function loadBillingTabPlans() {
         ${plan.id === 'plan_pro' ? '<span class="popular-badge">Recommended</span>' : ''}
         <h3>${escapeHtml(plan.name)}</h3>
         <p class="text-muted">Best for growing teams</p>
-        <div class="pricing-price">$${plan.price}<span>/${plan.billingCycle === 'monthly' ? 'mo' : 'yr'}</span></div>
+        <div class="pricing-price">₹${plan.price}<span>/${plan.billingCycle === 'monthly' ? 'mo' : 'yr'}</span></div>
         <button class="btn btn-primary btn-block btn-lg" onclick="openCheckoutModal('${plan.id}')">Upgrade Plan</button>
         <ul class="pricing-features">${listFeatures}</ul>
       `;
@@ -1204,7 +1054,7 @@ function openCheckoutModal(planId) {
     const plan = plans.find(p => p.id === planId);
     if (plan) {
       document.getElementById('checkout-plan-name').innerText = plan.name;
-      document.getElementById('checkout-plan-price').innerHTML = `$${plan.price}<span>/${plan.billingCycle === 'monthly' ? 'month' : 'year'}</span>`;
+      document.getElementById('checkout-plan-price').innerHTML = `₹${plan.price}<span>/${plan.billingCycle === 'monthly' ? 'month' : 'year'}</span>`;
       modal.classList.add('active');
     }
   }).catch(err => showToast(err.message, 'danger'));
@@ -1216,29 +1066,81 @@ function closeCheckoutModal() {
 
 async function executeSubscriptionPurchase() {
   const btnText = document.getElementById('checkout-btn-text');
-  btnText.innerText = 'Processing simulated transaction...';
+  btnText.innerText = 'Initializing Razorpay...';
   document.getElementById('btn-confirm-checkout').disabled = true;
 
   try {
-    const response = await apiFetch('/api/crm/subscribe', {
+    // Check if Razorpay is configured
+    const keyRes = await apiFetch('/api/razorpay/key');
+    if (!keyRes.key) {
+      showToast('Payment gateway is not configured by the admin yet.', 'warning');
+      btnText.innerText = 'Pay & Subscribe';
+      document.getElementById('btn-confirm-checkout').disabled = false;
+      return;
+    }
+
+    // Create Order
+    const orderRes = await apiFetch('/api/razorpay/create-order', {
       method: 'POST',
       body: JSON.stringify({ planId: state.selectedPlanId })
     });
 
-    // Update local state user object
-    state.currentUser = response.user;
-    localStorage.setItem('apex_crm_user', JSON.stringify(state.currentUser));
-    
-    // Refresh sidebar profile context
-    updateUserProfileUI();
+    const options = {
+      key: keyRes.key,
+      amount: orderRes.order.amount,
+      currency: orderRes.order.currency,
+      name: "ApexCRM SaaS",
+      description: `Upgrade to ${orderRes.plan.name}`,
+      order_id: orderRes.order.id,
+      handler: async function (response) {
+        try {
+          const verifyRes = await apiFetch('/api/razorpay/verify', {
+            method: 'POST',
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              planId: state.selectedPlanId
+            })
+          });
 
-    showToast(`Upgrade success! You are now subscribed to ${state.currentUser.planId === 'plan_pro' ? 'Growth Pro' : 'Enterprise Plus'}`, 'success');
-    closeCheckoutModal();
-    switchTab('user-billing');
+          // Update local state user object
+          state.currentUser.planId = state.selectedPlanId;
+          state.currentUser.planStatus = 'active';
+          localStorage.setItem('apex_crm_user', JSON.stringify(state.currentUser));
+          
+          updateUserProfileUI();
+          showToast(`Upgrade success! You are now subscribed to ${orderRes.plan.name}`, 'success');
+          closeCheckoutModal();
+          switchTab('user-billing');
+
+        } catch (verErr) {
+          showToast(verErr.message || 'Payment verification failed', 'danger');
+        }
+      },
+      prefill: {
+        name: state.currentUser.name,
+        email: state.currentUser.email
+      },
+      theme: {
+        color: "#4f46e5"
+      },
+      modal: {
+        ondismiss: function() {
+          btnText.innerText = 'Pay & Subscribe';
+          document.getElementById('btn-confirm-checkout').disabled = false;
+        }
+      }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.on('payment.failed', function (response){
+        showToast(`Payment Failed: ${response.error.description}`, 'danger');
+    });
+    rzp.open();
 
   } catch (err) {
     showToast(err.message, 'danger');
-  } finally {
     btnText.innerText = 'Pay & Subscribe';
     document.getElementById('btn-confirm-checkout').disabled = false;
   }
@@ -1252,9 +1154,9 @@ async function loadAdminDashboardStats() {
     state.adminStats = data;
 
     // Fill metrics
-    document.getElementById('admin-stat-mrr').innerText = '$' + data.totalRevenue.toLocaleString();
+    document.getElementById('admin-stat-mrr').innerText = '₹' + data.totalRevenue.toLocaleString();
     document.getElementById('admin-stat-users').innerText = data.activeUsersCount;
-    document.getElementById('admin-stat-stt').innerText = data.totalSttUsage;
+    document.getElementById('admin-stat-tx').innerText = data.totalTransactionsCount;
     document.getElementById('admin-stat-leads').innerText = data.totalLeads;
 
     // Render Activity log feeds
@@ -1317,7 +1219,7 @@ function renderAdminCharts(data) {
     data: {
       labels: chartLabels,
       datasets: [{
-        label: 'SaaS Earnings ($)',
+        label: 'SaaS Earnings (₹)',
         data: chartValues,
         borderColor: '#4f46e5',
         backgroundColor: 'rgba(79, 70, 229, 0.05)',
@@ -1385,7 +1287,7 @@ function renderAdminPlansTable() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><strong>${escapeHtml(plan.name)}</strong></td>
-      <td><strong>$${plan.price}</strong></td>
+      <td><strong>₹${plan.price}</strong></td>
       <td><span class="status-badge info">${plan.billingCycle}</span></td>
       <td>
         <ul style="list-style:none; font-size:0.8rem; color:var(--text-secondary)">
@@ -1543,7 +1445,7 @@ async function loadAdminTransactions() {
         <td><code>${escapeHtml(t.invoiceNo)}</code></td>
         <td><strong>${escapeHtml(t.userName)}</strong></td>
         <td><span class="badge badge-indigo-light">${escapeHtml(t.planName)}</span></td>
-        <td><strong>$${t.amount}</strong></td>
+        <td><strong>₹${t.amount}</strong></td>
         <td><span class="status-badge info">${t.billingCycle}</span></td>
         <td>${new Date(t.timestamp).toLocaleDateString()} ${new Date(t.timestamp).toLocaleTimeString()}</td>
         <td><span class="status-badge success">${t.status}</span></td>
@@ -1575,7 +1477,7 @@ async function loadLandingPricingPlans() {
         ${plan.id === 'plan_pro' ? '<span class="popular-badge">Popular Choice</span>' : ''}
         <h3>${escapeHtml(plan.name)}</h3>
         <p class="text-muted">Perfect plan settings</p>
-        <div class="pricing-price">$${plan.price}<span>/${plan.billingCycle === 'monthly' ? 'mo' : 'yr'}</span></div>
+        <div class="pricing-price">₹${plan.price}<span>/${plan.billingCycle === 'monthly' ? 'mo' : 'yr'}</span></div>
         <button class="btn btn-primary btn-block btn-lg" onclick="showView('auth-register')">Get Started</button>
         <ul class="pricing-features">${listFeatures}</ul>
       `;
@@ -1589,7 +1491,81 @@ async function loadLandingPricingPlans() {
   }
 }
 
+async function loadAdminTransactions() {
+  try {
+    const data = await apiFetch('/api/admin/transactions');
+    const tbody = document.getElementById('admin-transactions-tbody');
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No transactions recorded yet.</td></tr>`;
+      return;
+    }
+
+    data.forEach(tx => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><span class="badge badge-indigo-light">${tx.invoiceNo}</span></td>
+        <td><strong>${escapeHtml(tx.userName)}</strong></td>
+        <td>${escapeHtml(tx.planName)}</td>
+        <td><span class="badge">${tx.billingCycle}</span></td>
+        <td class="font-medium">₹${tx.amount.toLocaleString()}</td>
+        <td>${new Date(tx.timestamp).toLocaleString()}</td>
+        <td><span class="status-badge success">Success</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    showToast(err.message, 'danger');
+  }
+}
+
+async function loadAdminSettings() {
+  try {
+    const data = await apiFetch('/api/admin/settings/razorpay');
+    document.getElementById('razorpay-key-id').value = data.keyId || '';
+    document.getElementById('razorpay-key-secret').value = data.keySecret || '';
+  } catch (err) {
+    showToast(err.message, 'danger');
+  }
+}
+
+async function saveRazorpaySettings(e) {
+  e.preventDefault();
+  const keyId = document.getElementById('razorpay-key-id').value.trim();
+  const keySecret = document.getElementById('razorpay-key-secret').value.trim();
+  
+  const btn = document.getElementById('btn-save-razorpay');
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = 'Saving...';
+  btn.disabled = true;
+
+  try {
+    await apiFetch('/api/admin/settings/razorpay', {
+      method: 'POST',
+      body: JSON.stringify({ keyId, keySecret })
+    });
+    showToast('Razorpay configuration saved successfully!', 'success');
+  } catch (err) {
+    showToast(err.message, 'danger');
+  } finally {
+    btn.innerHTML = originalHtml;
+    btn.disabled = false;
+  }
+}
+
 // ================= INITIALIZATION & HELPERS =================
+
+function handleGlobalSearch(query) {
+  if (state.currentUser && state.currentUser.role === 'user') {
+    // Redirect to pipeline view if not there
+    const pipelineActive = document.getElementById('tab-user-pipeline').classList.contains('active');
+    if (!pipelineActive) {
+      switchTab('user-pipeline');
+    }
+    renderPipelineLeads(query);
+  }
+}
 
 function escapeHtml(unsafe) {
   if (!unsafe) return '';

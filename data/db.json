@@ -114,11 +114,11 @@
       "email": "david.l@novatech.io",
       "phone": "+1 (555) 246-8102",
       "budget": 8500,
-      "status": "New",
+      "status": "Contacted",
       "priority": "Low",
       "notes": "Registered via web form. Needs follow up call to assess business requirements.",
       "createdAt": "2026-06-06T07:43:52.460Z",
-      "updatedAt": "2026-06-06T07:43:52.460Z"
+      "updatedAt": "2026-06-08T14:13:03.865Z"
     },
     {
       "id": "lead_4",
@@ -142,15 +142,85 @@
       "email": "m.brody@museum.org",
       "phone": "+44 20 7946 0958",
       "budget": 1500,
-      "status": "Contacted",
+      "status": "New",
       "priority": "Low",
       "notes": "Left a voicemail. Will follow up in 3 days.",
       "createdAt": "2026-06-04T07:43:52.460Z",
-      "updatedAt": "2026-06-05T07:43:52.460Z"
+      "updatedAt": "2026-06-08T14:14:23.732Z"
+    },
+    {
+      "userId": "user_demo",
+      "name": "Test Lead",
+      "company": "Test Company",
+      "email": "",
+      "phone": "",
+      "budget": 0,
+      "status": "New",
+      "priority": "Medium",
+      "notes": "",
+      "id": "lead_er5885917",
+      "createdAt": "2026-06-08T14:17:53.497Z",
+      "updatedAt": "2026-06-08T14:17:53.497Z"
     }
   ],
   "followups": [],
   "activities": [
+    {
+      "id": "act_usm6vmskp",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Lead Created",
+      "details": "Added lead \"Test Lead\" (Test Company)",
+      "timestamp": "2026-06-08T14:17:53.512Z"
+    },
+    {
+      "id": "act_cw3u2di4u",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Login",
+      "details": "Logged in to the CRM",
+      "timestamp": "2026-06-08T14:17:38.275Z"
+    },
+    {
+      "id": "act_434qx9eaq",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Login",
+      "details": "Logged in to the CRM",
+      "timestamp": "2026-06-08T14:16:25.889Z"
+    },
+    {
+      "id": "act_2id8abj89",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Lead Stage Updated",
+      "details": "Moved \"Marcus Brody\" from Qualified to New",
+      "timestamp": "2026-06-08T14:14:23.735Z"
+    },
+    {
+      "id": "act_9t6gw60si",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Lead Stage Updated",
+      "details": "Moved \"Marcus Brody\" from Contacted to Qualified",
+      "timestamp": "2026-06-08T14:14:11.307Z"
+    },
+    {
+      "id": "act_o7e5w0wx7",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Lead Stage Updated",
+      "details": "Moved \"David Lee\" from New to Contacted",
+      "timestamp": "2026-06-08T14:13:03.867Z"
+    },
+    {
+      "id": "act_v6rcu1omv",
+      "userId": "user_demo",
+      "userName": "Shivam Rawat",
+      "action": "Login",
+      "details": "Logged in to the CRM",
+      "timestamp": "2026-06-08T14:12:34.642Z"
+    },
     {
       "id": "act_oxh04i8nv",
       "userId": "user_demo",
